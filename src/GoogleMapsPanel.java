@@ -19,12 +19,12 @@ public class GoogleMapsPanel extends MapView {
 	private DatabaseMapDataSet[] mapDataSet;
 
 	public GoogleMapsPanel(MapViewOptions options, DatabaseMapDataSet[] DataSet) {
-		
+
 		super(options);
 		this.mapDataSet = DataSet;
-		
+
 		setOnMapReadyHandler(new MapReadyHandler() {
-			
+
 			@Override
 			public void onMapReady(MapStatus status) {
 				if (status == MapStatus.MAP_STATUS_OK) {
@@ -45,7 +45,7 @@ public class GoogleMapsPanel extends MapView {
 
 									final InfoWindow window = new InfoWindow(map);
 									window.setContent(
-											dataSet.getCityName() + ": " + dataSet.getNumberofUsers() + " users.");
+											dataSet.getCityName() + ": " + dataSet.getNumberofUsers() + " users");
 									window.open(map, marker);
 
 								}

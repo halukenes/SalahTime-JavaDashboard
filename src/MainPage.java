@@ -15,10 +15,11 @@ import java.awt.BorderLayout;
 
 public class MainPage {
 
-	private JFrame frame;
-	private String[] choicePanelItems = { "Number of Users", "Bot Traffic", "Sura Metrics", "City Metrics",
-			"Reminder Metrics", "Uses of 'Read Sura'", "Uses of 'Pray Times'", "Special Message Statistics" };
-	private DatabaseMapDataSet[] userMapDataSet;
+	private              JFrame               frame;
+	private static final String[]             choicePanelItems = { "Number of Users", "Bot Traffic", "Sura Metrics", "City Metrics",
+			                                                       "Reminder Metrics", "Uses of 'Read Sura'", "Uses of 'Pray Times'", 
+			                                                       "Special Message Statistics" };
+	private              DatabaseMapDataSet[] userMapDataSet;
 
 	/**
 	 * Launch the application.
@@ -59,10 +60,10 @@ public class MainPage {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
-		/*JPanel panel = new JPanel();
+		JPanel panel = new JPanel();
 		panel.setBounds(10, 36, 864, 614);
 		frame.getContentPane().add(panel);
-		panel.setLayout(new BorderLayout(0, 0));*/
+		panel.setLayout(new BorderLayout(0, 0));
 
 		MapViewOptions options = new MapViewOptions();
 		options.importPlaces();
@@ -78,9 +79,29 @@ public class MainPage {
 		choice.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				if (choice.getSelectedItem().equals("Number of Users")) {
+				switch (choice.getSelectedItem()) {
+				case "Number of Users":
+					MapViewOptions options = new MapViewOptions();
+					options.importPlaces();
+					final GoogleMapsPanel mapView = new GoogleMapsPanel(options, userMapDataSet);
+					mapView.setBounds(10, 36, 864, 614);
+					frame.getContentPane().add(mapView);
+					mapView.setVisible(true);
+					break;
+				case "Bot Traffic":
+					LineGraph a = new LineGraph();
+					new Thread() {
+			            @Override
+			            public void run() {
+			                javafx.application.Application.launch(a.getClass());
+			            }
+			        }.start();
+					frame.setBounds(100, 100, 900, 300);
 					System.out.println("j");
-					
+					break;
+
+				default:
+					break;
 				}
 			}
 		});

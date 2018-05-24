@@ -1,8 +1,11 @@
 import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JButton;
+import javax.swing.JDialog;
+
 import java.awt.Choice;
 import javax.swing.JPanel;
+import java.util.prefs.Preferences;
 
 import com.teamdev.jxmaps.MapViewOptions;
 
@@ -20,6 +23,11 @@ public class MainPage {
 			                                                       "Reminder Metrics", "Uses of 'Read Sura'", "Uses of 'Pray Times'", 
 			                                                       "Special Message Statistics" };
 	private              DatabaseMapDataSet[] userMapDataSet;
+	private              Preferences          prefs            = Preferences.userRoot().node(MainPage.class.getName());
+	private              String               untilnowID       = "untilnowID";
+	private              String               untildayID       = "untildayID";
+	private              String               startingID       = "startingID";
+	private              String               endingID         = "endingID";
 
 	/**
 	 * Launch the application.
@@ -41,6 +49,7 @@ public class MainPage {
 	 * Create the application.
 	 */
 	public MainPage() {
+		
 		try {
 			DatabaseConnection connection = new DatabaseConnection();
 			userMapDataSet = connection.getdatafor_traffic();
@@ -60,17 +69,25 @@ public class MainPage {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
-		JPanel panel = new JPanel();
+		/*JPanel panel = new JPanel();
 		panel.setBounds(10, 36, 864, 614);
 		frame.getContentPane().add(panel);
-		panel.setLayout(new BorderLayout(0, 0));
+		panel.setLayout(new BorderLayout(0, 0));*/
 
 		MapViewOptions options = new MapViewOptions();
 		options.importPlaces();
-		final GoogleMapsPanel mapView = new GoogleMapsPanel(options, userMapDataSet);
-		mapView.setBounds(10, 36, 864, 614);
-		frame.getContentPane().add(mapView);
-		mapView.setVisible(true);
+		final GoogleMapsPanel mapView1 = new GoogleMapsPanel(options, userMapDataSet);
+		mapView1.setBounds(10, 36, 864, 614);
+		frame.getContentPane().add(mapView1);
+		mapView1.setVisible(true);
+		
+		JButton btnNewButton = new JButton("Refresh");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
+		btnNewButton.setBounds(785, 10, 89, 23);
+		frame.getContentPane().add(btnNewButton);
 		
 		Choice choice = new Choice();
 		choice.setBounds(10, 10, 769, 20);
@@ -89,15 +106,38 @@ public class MainPage {
 					mapView.setVisible(true);
 					break;
 				case "Bot Traffic":
-					LineGraph a = new LineGraph();
-					new Thread() {
-			            @Override
-			            public void run() {
-			                javafx.application.Application.launch(a.getClass());
-			            }
-			        }.start();
-					frame.setBounds(100, 100, 900, 300);
-					System.out.println("j");
+					frame.getContentPane().remove(btnNewButton);
+					frame.getContentPane().remove(mapView1);
+					BotTrafficPanel trafficPanel = new BotTrafficPanel();
+					frame.setBounds(100, 100, 550, 400);
+					choice.setSize(510, 20);
+					trafficPanel.setBounds(10, 36, 550, 310);
+					frame.getContentPane().add(trafficPanel);
+					trafficPanel.setVisible(true);
+					trafficPanel.getBtnShowTheGraph().addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0) {
+							if(trafficPanel.getRdbtnDayUntilNow().isSelected()) {
+								prefs.putBoolean(untilnowID, true);
+								prefs.putInt(untildayID, Integer.parseInt(trafficPanel.getTextdayuntilNow().getText()));
+								new Thread() {
+						            @Override
+						            public void run() {
+						                javafx.application.Application.launch(TrafficLineChart.class);
+						            }
+						        }.start();
+							} else if (trafficPanel.getRdbtnNewRadioButton().isSelected()) {
+								prefs.putBoolean(untilnowID, false);
+								prefs.put(startingID, trafficPanel.getTextStartingDay().getText());
+								prefs.put(endingID, trafficPanel.getTextEndingDay().getText());
+								new Thread() {
+						            @Override
+						            public void run() {
+						                javafx.application.Application.launch(TrafficLineChart.class);
+						            }
+						        }.start();
+							}	
+						}
+					});
 					break;
 
 				default:
@@ -106,14 +146,6 @@ public class MainPage {
 			}
 		});
 		frame.getContentPane().add(choice);
-
-		JButton btnNewButton = new JButton("Refresh");
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-			}
-		});
-		btnNewButton.setBounds(785, 10, 89, 23);
-		frame.getContentPane().add(btnNewButton);
 
 	}
 }

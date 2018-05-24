@@ -28,10 +28,8 @@ public class MainPage {
 	private              String               untildayID       = "untildayID";
 	private              String               startingID       = "startingID";
 	private              String               endingID         = "endingID";
+	private              DatabaseConnection   connection;
 
-	/**
-	 * Launch the application.
-	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -45,13 +43,10 @@ public class MainPage {
 		});
 	}
 
-	/**
-	 * Create the application.
-	 */
 	public MainPage() {
 		
 		try {
-			DatabaseConnection connection = new DatabaseConnection();
+			connection = new DatabaseConnection();
 			userMapDataSet = connection.getdatafor_traffic();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -60,9 +55,6 @@ public class MainPage {
 		initialize();
 	}
 
-	/**
-	 * Initialize the contents of the frame.
-	 */
 	private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 900, 700);
@@ -84,6 +76,19 @@ public class MainPage {
 		JButton btnNewButton = new JButton("Refresh");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				try {
+					userMapDataSet = connection.getdatafor_traffic();
+					frame.getContentPane().remove(mapView1);
+					frame.setBounds(100, 100, 901, 700);
+					frame.setBounds(100, 100, 900, 700);
+					final GoogleMapsPanel mapView1 = new GoogleMapsPanel(options, userMapDataSet);
+					mapView1.setBounds(10, 36, 864, 614);
+					frame.getContentPane().add(mapView1);
+					mapView1.setVisible(true);
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 		btnNewButton.setBounds(785, 10, 89, 23);
@@ -98,16 +103,21 @@ public class MainPage {
 			public void itemStateChanged(ItemEvent e) {
 				switch (choice.getSelectedItem()) {
 				case "Number of Users":
+					frame.getContentPane().removeAll();
+					frame.setBounds(100, 100, 900, 700);
+					choice.setBounds(10, 10, 769, 20);
+					frame.getContentPane().add(btnNewButton);
+					frame.getContentPane().add(choice);
 					MapViewOptions options = new MapViewOptions();
 					options.importPlaces();
-					final GoogleMapsPanel mapView = new GoogleMapsPanel(options, userMapDataSet);
+					GoogleMapsPanel mapView = new GoogleMapsPanel(options, userMapDataSet);
 					mapView.setBounds(10, 36, 864, 614);
 					frame.getContentPane().add(mapView);
 					mapView.setVisible(true);
 					break;
 				case "Bot Traffic":
-					frame.getContentPane().remove(btnNewButton);
-					frame.getContentPane().remove(mapView1);
+					frame.getContentPane().removeAll();
+					frame.getContentPane().add(choice);
 					BotTrafficPanel trafficPanel = new BotTrafficPanel();
 					frame.setBounds(100, 100, 550, 400);
 					choice.setSize(510, 20);
@@ -138,6 +148,14 @@ public class MainPage {
 							}	
 						}
 					});
+					break;
+				case "Sura Metrics":
+					new Thread() {
+			            @Override
+			            public void run() {
+			                javafx.application.Application.launch(SuraPieChart.class);
+			            }
+			        }.start();
 					break;
 
 				default:

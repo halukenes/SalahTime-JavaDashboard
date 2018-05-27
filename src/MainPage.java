@@ -47,7 +47,7 @@ public class MainPage {
 		
 		try {
 			connection = new DatabaseConnection();
-			userMapDataSet = connection.getdatafor_traffic();
+			userMapDataSet = connection.getdatafor_map();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -77,7 +77,7 @@ public class MainPage {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					userMapDataSet = connection.getdatafor_traffic();
+					userMapDataSet = connection.getdatafor_map();
 					frame.getContentPane().remove(mapView1);
 					frame.setBounds(100, 100, 901, 700);
 					frame.setBounds(100, 100, 900, 700);
@@ -154,6 +154,22 @@ public class MainPage {
 			            @Override
 			            public void run() {
 			                javafx.application.Application.launch(SuraPieChart.class);
+			            }
+			        }.start();
+					break;
+				case "City Metrics":
+					new Thread() {
+			            @Override
+			            public void run() {
+			                javafx.application.Application.launch(CityPieChart.class);
+			            }
+			        }.start();
+					break;
+				case "Reminder Metrics":
+					new Thread() {
+			            @Override
+			            public void run() {
+			                javafx.application.Application.launch(CityPieChart.class);
 			            }
 			        }.start();
 					break;

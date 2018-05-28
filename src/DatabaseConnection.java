@@ -22,6 +22,9 @@ public class DatabaseConnection {
 			                                                       + "GROUP BY cityname) AS temp;";
 	private static final String      QUERY_ROWOF_TRAFFICDB         = "SELECT * FROM trafficdb ORDER BY trafficid DESC LIMIT ";
 	private static final String      QUERY_ROWBT_TRAFFICDB         = "select trafficdate, trafficcount from trafficdb where trafficid >= ";
+	private static final String      QUERY_ROWRS_TRAFFICDB         = "select trafficdate, totalreadsura from trafficdb where trafficid >= ";
+	private static final String      QUERY_ROWST_TRAFFICDB         = "select trafficdate, totalpraytime from trafficdb where trafficid >= ";
+	private static final String      QUERY_ROWSTWL_TRAFFICDB       = "select trafficdate, totalpraytimenotloc from trafficdb where trafficid >= ";
 	private static final String      QUERY_GETTINGDATE_ID          = "select trafficid from trafficdb where trafficdate = '";
 	private static final String      QUERY_GET_SURAS               = "SELECT * FROM suras;";
 	private static final String      QUERY_GET_REMINDCODES         = "SELECT remindcode FROM users WHERE remindcode <> '0000000';";
@@ -31,6 +34,14 @@ public class DatabaseConnection {
 	private              String      untildayID                    = "untildayID";
 	private              String      startingID                    = "startingID";
 	private              String      endingID                      = "endingID";
+	private              String      untilnowIDR                   = "untilnowIDR";
+	private              String      untildayIDR                   = "untildayIDR";
+	private              String      startingIDR                   = "startingIDR";
+	private              String      endingIDR                     = "endingIDR";
+	private              String      untilnowIDS                   = "untilnowIDS";
+	private              String      untildayIDS                   = "untildayIDS";
+	private              String      startingIDS                   = "startingIDS";
+	private              String      endingIDS                     = "endingIDS";
 	private static final String      first                         = "didn't share location";
 	private static final String      second                        = "0 salah time";
 	private static final String      third                         = "1 salah time";
@@ -110,6 +121,133 @@ public class DatabaseConnection {
 		}
 
 		return new TrafficLineGraphDataSet(datafromDB);
+
+	}
+	
+
+
+	public XYChart.Series getDataSetfor_SuraColumnChart() throws SQLException {
+		XYChart.Series series = new XYChart.Series();
+		if (prefs.getBoolean(untilnowIDR, true)) {
+			int rowNumber = prefs.getInt(untildayIDR, 5);
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(30);
+			ResultSet resultSet = statement.executeQuery(QUERY_ROWOF_TRAFFICDB + rowNumber + ";");
+			int counter = 0;
+			String[] arrayDays   = new String[rowNumber];
+			int[]    arrayValues = new int[rowNumber];
+			while (resultSet.next()) {
+				arrayDays[counter]   = resultSet.getString("trafficdate");
+				arrayValues[counter] = resultSet.getInt("totalreadsura");
+				counter++;
+			}
+			for (int i = counter-1; i >= 0; i--) {
+				series.getData().add(new XYChart.Data(arrayDays[i], arrayValues[i]));
+			}
+		} else {
+			ResultSet resultSetStartingDate = connection.createStatement()
+					.executeQuery(QUERY_GETTINGDATE_ID + prefs.get(startingIDR, "") + "';");
+			int startingdate = 0;
+			while (resultSetStartingDate.next()) {
+				startingdate = resultSetStartingDate.getInt("trafficid");
+			}
+			ResultSet resultSetEndingDate = connection.createStatement()
+					.executeQuery(QUERY_GETTINGDATE_ID + prefs.get(endingIDR, "") + "';");
+			int endingdate = 0;
+			while (resultSetEndingDate.next()) {
+				endingdate = resultSetEndingDate.getInt("trafficid");
+			}
+			ResultSet resultSet = connection.createStatement()
+					.executeQuery(QUERY_ROWRS_TRAFFICDB + startingdate + " and trafficid <=" + endingdate + ";");
+			while (resultSet.next()) {
+				series.getData().add(new XYChart.Data(resultSet.getString("trafficdate"), resultSet.getInt("totalreadsura")));
+			}
+		}
+
+		return series;
+
+	}
+	
+	public XYChart.Series getDataSetfor_SalahTimeColumnChartLocation() throws SQLException {
+		XYChart.Series series = new XYChart.Series();
+		if (prefs.getBoolean(untilnowIDS, true)) {
+			int rowNumber = prefs.getInt(untildayIDS, 5);
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(30);
+			ResultSet resultSet = statement.executeQuery(QUERY_ROWOF_TRAFFICDB + rowNumber + ";");
+			int       counter = 0;
+			String[]  arrayDays   = new String[rowNumber];
+			int[]     arrayValues = new int[rowNumber];
+			while (resultSet.next()) {
+				arrayDays[counter]   = resultSet.getString("trafficdate");
+				arrayValues[counter] = resultSet.getInt("totalpraytime");
+				counter++;
+			}
+			for (int i = counter-1; i >= 0; i--) {
+				series.getData().add(new XYChart.Data(arrayDays[i], arrayValues[i]));
+			}
+		} else {
+			ResultSet resultSetStartingDate = connection.createStatement()
+					.executeQuery(QUERY_GETTINGDATE_ID + prefs.get(startingIDS, "") + "';");
+			int startingdate = 0;
+			while (resultSetStartingDate.next()) {
+				startingdate = resultSetStartingDate.getInt("trafficid");
+			}
+			ResultSet resultSetEndingDate = connection.createStatement()
+					.executeQuery(QUERY_GETTINGDATE_ID + prefs.get(endingIDS, "") + "';");
+			int endingdate = 0;
+			while (resultSetEndingDate.next()) {
+				endingdate = resultSetEndingDate.getInt("trafficid");
+			}
+			ResultSet resultSet = connection.createStatement()
+					.executeQuery(QUERY_ROWST_TRAFFICDB + startingdate + " and trafficid <=" + endingdate + ";");
+			while (resultSet.next()) {
+				series.getData().add(new XYChart.Data(resultSet.getString("trafficdate"), resultSet.getInt("totalpraytime")));
+				}
+			}
+		
+		return series;
+		}
+		
+		public XYChart.Series getDataSetfor_SalahTimeColumnChartLocationwithLocaiton() throws SQLException {
+			XYChart.Series series = new XYChart.Series();
+			if (prefs.getBoolean(untilnowIDS, true)) {
+				int rowNumber = prefs.getInt(untildayIDS, 5);
+				Statement statement = connection.createStatement();
+				statement.setQueryTimeout(30);
+				ResultSet resultSet = statement.executeQuery(QUERY_ROWOF_TRAFFICDB + rowNumber + ";");
+				int       counter = 0;
+				String[]  arrayDays   = new String[rowNumber];
+				int[]     arrayValues = new int[rowNumber];
+				while (resultSet.next()) {
+					arrayDays[counter]   = resultSet.getString("trafficdate");
+					arrayValues[counter] = resultSet.getInt("totalpraytimenotloc");
+					counter++;
+				}
+				for (int i = counter-1; i >= 0; i--) {
+					series.getData().add(new XYChart.Data(arrayDays[i], arrayValues[i]));
+				}
+			} else {
+				ResultSet resultSetStartingDate = connection.createStatement()
+						.executeQuery(QUERY_GETTINGDATE_ID + prefs.get(startingIDS, "") + "';");
+				int startingdate = 0;
+				while (resultSetStartingDate.next()) {
+					startingdate = resultSetStartingDate.getInt("trafficid");
+				}
+				ResultSet resultSetEndingDate = connection.createStatement()
+						.executeQuery(QUERY_GETTINGDATE_ID + prefs.get(endingIDS, "") + "';");
+				int endingdate = 0;
+				while (resultSetEndingDate.next()) {
+					endingdate = resultSetEndingDate.getInt("trafficid");
+				}
+				ResultSet resultSet = connection.createStatement()
+						.executeQuery(QUERY_ROWSTWL_TRAFFICDB + startingdate + " and trafficid <=" + endingdate + ";");
+				while (resultSet.next()) {
+					series.getData().add(new XYChart.Data(resultSet.getString("trafficdate"), resultSet.getInt("totalpraytimenotloc")));
+				}
+			}
+
+		return series;
 
 	}
 	

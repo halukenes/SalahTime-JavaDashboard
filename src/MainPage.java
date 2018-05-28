@@ -28,6 +28,14 @@ public class MainPage {
 	private              String               untildayID       = "untildayID";
 	private              String               startingID       = "startingID";
 	private              String               endingID         = "endingID";
+	private              String               untilnowIDR      = "untilnowIDR";
+	private              String               untildayIDR      = "untildayIDR";
+	private              String               startingIDR      = "startingIDR";
+	private              String               endingIDR        = "endingIDR";
+	private              String               untilnowIDS      = "untilnowIDS";
+	private              String               untildayIDS      = "untildayIDS";
+	private              String               startingIDS      = "startingIDS";
+	private              String               endingIDS        = "endingIDS";
 	private              DatabaseConnection   connection;
 
 	public static void main(String[] args) {
@@ -169,11 +177,78 @@ public class MainPage {
 					new Thread() {
 			            @Override
 			            public void run() {
-			                javafx.application.Application.launch(CityPieChart.class);
+			                javafx.application.Application.launch(CReminderMetrics.class);
 			            }
 			        }.start();
 					break;
-
+				case "Uses of 'Read Sura'":
+					frame.getContentPane().removeAll();
+					frame.getContentPane().add(choice);
+					ReadSuraPanel suraPanel = new ReadSuraPanel();
+					frame.setBounds(100, 100, 550, 400);
+					choice.setSize(510, 20);
+					suraPanel.setBounds(10, 36, 550, 310);
+					frame.getContentPane().add(suraPanel);
+					suraPanel.setVisible(true);
+					suraPanel.getBtnShowTheGraph().addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0) {
+							if(suraPanel.getRdbtnDayUntilNow().isSelected()) {
+								prefs.putBoolean(untilnowIDR, true);
+								prefs.putInt(untildayIDR, Integer.parseInt(suraPanel.getTextdayuntilNow().getText()));
+								new Thread() {
+						            @Override
+						            public void run() {
+						                javafx.application.Application.launch(CReadingSura.class);
+						            }
+						        }.start();
+							} else if (suraPanel.getRdbtnNewRadioButton().isSelected()) {
+								prefs.putBoolean(untilnowIDR, false);
+								prefs.put(startingIDR, suraPanel.getTextStartingDay().getText());
+								prefs.put(endingIDR, suraPanel.getTextEndingDay().getText());
+								new Thread() {
+						            @Override
+						            public void run() {
+						                javafx.application.Application.launch(CReadingSura.class);
+						            }
+						        }.start();
+							}	
+						}
+					});
+					break;
+				case "Uses of 'Pray Times'":
+					frame.getContentPane().removeAll();
+					frame.getContentPane().add(choice);
+					PrayTimePanel prayPanel = new PrayTimePanel();
+					frame.setBounds(100, 100, 550, 400);
+					choice.setSize(510, 20);
+					prayPanel.setBounds(10, 36, 550, 310);
+					frame.getContentPane().add(prayPanel);
+					prayPanel.setVisible(true);
+					prayPanel.getBtnShowTheGraph().addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0) {
+							if(prayPanel.getRdbtnDayUntilNow().isSelected()) {
+								prefs.putBoolean(untilnowIDS, true);
+								prefs.putInt(untildayIDS, Integer.parseInt(prayPanel.getTextdayuntilNow().getText()));
+								new Thread() {
+						            @Override
+						            public void run() {
+						                javafx.application.Application.launch(CSalahTime.class);
+						            }
+						        }.start();
+							} else if (prayPanel.getRdbtnNewRadioButton().isSelected()) {
+								prefs.putBoolean(untilnowIDS, false);
+								prefs.put(startingIDS, prayPanel.getTextStartingDay().getText());
+								prefs.put(endingIDS, prayPanel.getTextEndingDay().getText());
+								new Thread() {
+						            @Override
+						            public void run() {
+						                javafx.application.Application.launch(CSalahTime.class);
+						            }
+						        }.start();
+							}	
+						}
+					});
+					break;
 				default:
 					break;
 				}

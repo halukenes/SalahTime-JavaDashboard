@@ -1,5 +1,6 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -30,6 +31,7 @@ public class DatabaseConnection {
 	private static final String      QUERY_GET_REMINDCODES         = "SELECT remindcode FROM users WHERE remindcode <> '0000000';";
 	private static final String      QUERY_COUNTOF_ZEROREMINDCODES = "SELECT COUNT(*) FROM users GROUP BY remindcode HAVING remindcode = '0000000';";
 	private static final String      QUERY_GETNULL_CITIES          = "SELECT COUNT(*) FROM users WHERE cityname IS NULL OR cityname = '';";
+	private static final String      QUERY_SEND_MESSAGES           = "INSERT INTO messages VALUES (1, '";
 	private              String      untilnowID                    = "untilnowID";
 	private              String      untildayID                    = "untildayID";
 	private              String      startingID                    = "startingID";
@@ -49,8 +51,9 @@ public class DatabaseConnection {
 	private static final String      fifth                         = "3 salah time";
 	private static final String      sixth                         = "4 salah time";
 	private static final String      seventh                       = "5 salah time";
-	private              Preferences prefs = Preferences.userRoot().node(MainPage.class.getName());
-	private              Connection connection;
+	private              Preferences prefs                         = Preferences.userRoot().node(MainPage.class.getName());
+	private              Connection        connection;
+	private              PreparedStatement pst = null;
 
 	public DatabaseConnection() throws SQLException {
 		this.connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
@@ -258,6 +261,18 @@ public class DatabaseConnection {
 			pieChartData.add(new PieChart.Data(resultSet.getString("suraname").substring(0, 1).toUpperCase() + resultSet.getString("suraname").substring(1) + ": " + resultSet.getInt("readcount"), resultSet.getInt("readcount")));
 		}
 		return pieChartData;
+		
+	}
+	
+	public boolean sendMessage_toAllUsers(String text) {
+		boolean isError = true;
+		try {
+			connection.createStatement().executeUpdate(QUERY_SEND_MESSAGES + text + "');");
+		} catch (SQLException e) {
+			isError = false;
+			e.printStackTrace();
+		}
+		return isError;
 		
 	}
 	

@@ -1,5 +1,6 @@
 import java.awt.EventQueue;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 
@@ -21,7 +22,7 @@ public class MainPage {
 	private              JFrame               frame;
 	private static final String[]             choicePanelItems = { "Number of Users", "Bot Traffic", "Sura Metrics", "City Metrics",
 			                                                       "Reminder Metrics", "Uses of 'Read Sura'", "Uses of 'Pray Times'", 
-			                                                       "Special Message Statistics" };
+			                                                       "Special Day Message" };
 	private              DatabaseMapDataSet[] userMapDataSet;
 	private              Preferences          prefs            = Preferences.userRoot().node(MainPage.class.getName());
 	private              String               untilnowID       = "untilnowID";
@@ -246,6 +247,25 @@ public class MainPage {
 						            }
 						        }.start();
 							}	
+						}
+					});
+					break;
+				case "Special Day Message":
+					frame.getContentPane().removeAll();
+					frame.getContentPane().add(choice);
+					SpecialMessagePanel messagePanel = new SpecialMessagePanel();
+					frame.setBounds(100, 100, 550, 400);
+					choice.setSize(510, 20);
+					messagePanel.setBounds(10, 36, 570, 310);
+					frame.getContentPane().add(messagePanel);
+					messagePanel.setVisible(true);
+					messagePanel.getBtnNewButton().addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0) {
+							if (connection.sendMessage_toAllUsers(messagePanel.getTextField().getText())) {
+								JOptionPane.showMessageDialog(messagePanel, "The message is sent successfully!");
+							} else {
+								JOptionPane.showMessageDialog(messagePanel, "Failed to send the message!");
+							}
 						}
 					});
 					break;

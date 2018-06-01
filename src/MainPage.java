@@ -70,11 +70,6 @@ public class MainPage {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
-		/*JPanel panel = new JPanel();
-		panel.setBounds(10, 36, 864, 614);
-		frame.getContentPane().add(panel);
-		panel.setLayout(new BorderLayout(0, 0));*/
-
 		MapViewOptions options = new MapViewOptions();
 		options.importPlaces();
 		final GoogleMapsPanel mapView1 = new GoogleMapsPanel(options, userMapDataSet);
@@ -123,6 +118,23 @@ public class MainPage {
 					mapView.setBounds(10, 36, 864, 614);
 					frame.getContentPane().add(mapView);
 					mapView.setVisible(true);
+					btnNewButton.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0) {
+							try {
+								userMapDataSet = connection.getdatafor_map();
+								frame.getContentPane().remove(mapView);
+								frame.setBounds(100, 100, 901, 700);
+								frame.setBounds(100, 100, 900, 700);
+								final GoogleMapsPanel mapView = new GoogleMapsPanel(options, userMapDataSet);
+								mapView.setBounds(10, 36, 864, 614);
+								frame.getContentPane().add(mapView);
+								mapView.setVisible(true);
+							} catch (SQLException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+					});
 					break;
 				case "Bot Traffic":
 					frame.getContentPane().removeAll();
